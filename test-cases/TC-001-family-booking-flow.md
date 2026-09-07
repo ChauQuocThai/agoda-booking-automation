@@ -53,10 +53,11 @@ type, and arrive at a payment page that still reflects every earlier choice.
 ## Alternative flow
 
 **A1 — the selected property has no rooms for those dates.**
-At step 8, if the room grid offers no bookable rate, return to the results and
-repeat steps 7 to 10 with the next property in the list. The remaining
-assertions then apply to that property instead. The automated test walks up to
-four results before failing.
+At step 8, if the room grid offers no bookable rate, or lists fewer room types
+than the case needs, return to the results and repeat steps 7 to 10 with the
+next property in the list. The remaining assertions then apply to that property
+instead, and the run records which property was booked. The automated test
+walks up to two results, which is what its three-minute timeout affords.
 
 ## Notes
 

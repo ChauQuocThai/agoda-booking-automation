@@ -4,8 +4,8 @@ import { HotelOffer } from '../src/data/types';
 import { PropertyPage } from '../src/pages/PropertyPage';
 import { isoDateFromToday, toShortDate } from '../src/utils/date';
 
-/** How far down the results to look when the searched hotel is fully booked. */
-const MAX_HOTELS_TO_TRY = 4;
+/** Two candidates is what the three-minute test timeout affords; see TC-001 A1. */
+const MAX_HOTELS_TO_TRY = 2;
 
 const booking = MUONG_THANH_NHA_TRANG;
 
@@ -36,9 +36,11 @@ test('a family of two adults and two children books the second room type', async
       expect(candidateOffer.price, 'the card should advertise a price').toMatch(PRICE_PATTERN);
 
       const candidate: PropertyPage = await results.openProperty(index);
-      await candidate.openBookingDetails();
+      const listsEnoughRoomTypes = await candidate.openBookingDetails(SECOND_ROOM_INDEX + 1);
 
-      if (await candidate.hasBookableRooms()) {
+      if (listsEnoughRoomTypes && (await candidate.hasBookableRooms())) {
+        // A substituted property must never be silent in the report.
+        test.info().annotations.push({ type: 'property booked', description: candidateOffer.name });
         return { property: candidate, offer: candidateOffer };
       }
       await candidate.dispose();
@@ -52,8 +54,9 @@ test('a family of two adults and two children books the second room type', async
   });
 
   const roomType = await test.step('Take the second room type and book its first rate', async () => {
-    expect(await property.roomTypeCount()).toBeGreaterThan(SECOND_ROOM_INDEX);
-    return property.roomTypeName(SECOND_ROOM_INDEX);
+    const name = await property.roomTypeName(SECOND_ROOM_INDEX);
+    expect(name, 'the second room type should be named').not.toHaveLength(0);
+    return name;
   });
 
   const payment = await property.bookFirstRateOf(SECOND_ROOM_INDEX);

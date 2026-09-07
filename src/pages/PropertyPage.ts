@@ -28,16 +28,17 @@ export class PropertyPage extends BasePage {
   }
 
   /**
-   * The grid container ships with the page but its rows are fetched only once
-   * it enters the viewport, so the section is scrolled to before being read.
+   * The grid ships with the page but fetches its rows once it enters the
+   * viewport. A sold-out property renders no rows at all, so this reports
+   * rather than throws and the caller can move on to the next result.
    */
-  async openBookingDetails(): Promise<void> {
+  async openBookingDetails(minRoomTypes: number): Promise<boolean> {
     await this.roomGrid.scrollIntoViewIfNeeded();
-    await expect(this.roomNames.first()).toBeVisible({ timeout: 60_000 });
-  }
-
-  async roomTypeCount(): Promise<number> {
-    return this.roomNames.count();
+    return this.roomNames
+      .nth(minRoomTypes - 1)
+      .waitFor({ state: 'visible', timeout: 30_000 })
+      .then(() => true)
+      .catch(() => false);
   }
 
   async roomTypeName(index: number): Promise<string> {
