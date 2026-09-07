@@ -43,7 +43,7 @@ are derived from the current date at run time, so the test data never expires.
 
 ```
 ├── playwright.config.ts          Timeouts, reporters, browser projects
-├── tsconfig.json                 Strict compiler settings and path aliases
+├── tsconfig.json                 Strict compiler settings
 ├── test-cases/
 │   └── TC-001-family-booking-flow.md    The test case in prose, including the alternative flow
 ├── src/

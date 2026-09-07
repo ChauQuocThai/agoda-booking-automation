@@ -13,15 +13,7 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["node"],
-    "baseUrl": ".",
-    "paths": {
-      "@pages/*": ["src/pages/*"],
-      "@components/*": ["src/components/*"],
-      "@data/*": ["src/data/*"],
-      "@utils/*": ["src/utils/*"],
-      "@fixtures/*": ["src/fixtures/*"]
-    }
+    "types": ["node"]
   },
   "include": ["src/**/*.ts", "tests/**/*.ts", "playwright.config.ts"]
 }

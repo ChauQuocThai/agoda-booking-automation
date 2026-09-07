@@ -4,8 +4,6 @@ import { SearchResultsPage } from './SearchResultsPage';
 import { DestinationAutosuggest } from '../components/DestinationAutosuggest';
 import { OccupancyPicker } from '../components/OccupancyPicker';
 import { StayDatePicker } from '../components/StayDatePicker';
-import { BookingSearch } from '../data/types';
-import { isoDateFromToday } from '../utils/date';
 import { byElementName } from '../utils/locators';
 
 export class HomePage extends BasePage {
@@ -26,17 +24,6 @@ export class HomePage extends BasePage {
     await this.page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(this.searchButton).toBeVisible();
     await this.dismissOverlays();
-  }
-
-  async fillSearchForm(booking: BookingSearch): Promise<void> {
-    await this.destination.chooseProperty(booking.searchKeyword, booking.expectedSuggestion);
-
-    await this.dates.selectStay(
-      isoDateFromToday(booking.dates.checkInOffsetDays),
-      isoDateFromToday(booking.dates.checkOutOffsetDays),
-    );
-
-    await this.occupancy.apply(booking.occupancy);
   }
 
   /** Results replace the current page on some variants and open a tab on others. */

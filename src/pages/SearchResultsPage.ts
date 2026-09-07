@@ -12,10 +12,6 @@ export class SearchResultsPage extends BasePage {
     this.cards = page.locator(byElementName('property-card-content'));
   }
 
-  get target(): Page {
-    return this.page;
-  }
-
   async waitForResults(): Promise<void> {
     await expect(this.cards.first()).toBeVisible();
     await this.dismissOverlays();

@@ -1,12 +1,8 @@
-import { Locator, Page } from '@playwright/test';
+import { Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
 import { byElementName, byTestId } from '../utils/locators';
 
 export class PaymentPage extends BasePage {
-  constructor(page: Page) {
-    super(page);
-  }
-
   get url(): string {
     return this.page.url();
   }
