@@ -1,6 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { ChildAges, Occupancy } from '../data/types';
 import { byElementName, bySelenium } from '../utils/locators';
+import { ageOptionLabel } from '../utils/occupancy';
 
 interface CounterSpec {
   /** Agoda's own hook for the number shown between the two buttons. */
@@ -32,11 +33,6 @@ const COUNTERS = {
 } as const satisfies Record<string, CounterSpec>;
 
 type CounterName = keyof typeof COUNTERS;
-
-function ageOptionLabel(age: number): string {
-  if (age < 1) return '<1 year old';
-  return age === 1 ? '1 year old' : `${age} years old`;
-}
 
 export class OccupancyPicker {
   /** The closed control, which summarises the current selection. */

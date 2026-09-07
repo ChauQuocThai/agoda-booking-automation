@@ -2,8 +2,8 @@
  * Agoda tags every day cell in the calendar with an ISO date, so the picker is
  * driven by these strings rather than by clicking through month arrows.
  */
-export function isoDateFromToday(offsetDays: number): string {
-  const date = new Date();
+export function isoDateFromToday(offsetDays: number, from: Date = new Date()): string {
+  const date = new Date(from);
   date.setDate(date.getDate() + offsetDays);
   return toIsoDate(date);
 }

@@ -5,10 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "playwright test",
-    "test:headed": "playwright test --headed --workers=1",
-    "test:debug": "playwright test --debug",
+    "test:headed": "playwright test --project=chromium --headed --workers=1",
+    "test:debug": "playwright test --project=chromium --debug",
     "typecheck": "tsc --noEmit",
-    "report": "playwright show-report"
+    "report": "playwright show-report",
+    "test:unit": "playwright test --project=unit",
+    "test:e2e": "playwright test --project=chromium"
   },
   "keywords": [],
   "author": "",

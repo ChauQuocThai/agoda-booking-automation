@@ -2,6 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 
 const IS_CI = !!process.env.CI;
 
+// The browser projects share testDir with the unit specs and would otherwise
+// collect them once per browser.
+const E2E_ONLY = { testIgnore: '**/unit/**' } as const;
+
 export default defineConfig({
   testDir: './tests',
   outputDir: './test-results',
@@ -38,12 +42,15 @@ export default defineConfig({
   // different auto-suggest, so those are opt-in rather than part of a default
   // run — see "Supported browsers" in the README.
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'chromium', ...E2E_ONLY, use: { ...devices['Desktop Chrome'] } },
     ...(process.env.ALL_BROWSERS === '1'
       ? [
-          { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-          { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+          { name: 'firefox', ...E2E_ONLY, use: { ...devices['Desktop Firefox'] } },
+          { name: 'webkit', ...E2E_ONLY, use: { ...devices['Desktop Safari'] } },
         ]
       : []),
+
+    // Pure helpers, so no browser, no retries and a short timeout.
+    { name: 'unit', testDir: './tests/unit', retries: 0, timeout: 10 * 1000 },
   ],
 });
