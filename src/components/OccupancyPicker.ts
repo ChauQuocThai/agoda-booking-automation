@@ -69,17 +69,34 @@ export class OccupancyPicker {
     const spec = COUNTERS[counter];
     const value = this.panel.locator(spec.value);
 
-    for (let current = await this.read(value); current !== target; current = await this.read(value)) {
+    for (let current = await this.read(value, counter); current !== target; current = await this.read(value, counter)) {
       const button = this.panel.getByRole('button', { name: current < target ? spec.add : spec.subtract });
       await button.click();
-      await expect(value).not.toHaveText(String(current));
+
+      // At its own limits Agoda disables the control in one direction and simply
+      // ignores the click in the other, so progress is what gets checked rather
+      // than the button's state. Without this the loop spins until the test
+      // timeout and reports only that the value is still what it was.
+      try {
+        await expect(value).not.toHaveText(String(current), { timeout: 5_000 });
+      } catch {
+        throw new Error(`Agoda stopped at ${current} ${counter}; ${target} was asked for`);
+      }
     }
 
     await expect(value).toHaveText(String(target));
   }
 
-  private async read(value: Locator): Promise<number> {
-    return Number((await value.innerText()).trim());
+  private async read(value: Locator, counter: CounterName): Promise<number> {
+    const shown = (await value.innerText()).trim();
+    const count = Number(shown);
+
+    // A non-numeric read would compare false against the target and send the
+    // loop off in the subtract direction.
+    if (!Number.isInteger(count)) {
+      throw new Error(`The ${counter} counter showed "${shown}", not a number`);
+    }
+    return count;
   }
 
   /**
