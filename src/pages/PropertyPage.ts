@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 import { PaymentPage } from './PaymentPage';
-import { byElementName, byTestId } from '../utils/locators';
+import { byElementName, bySelenium, byTestId } from '../utils/locators';
 
 const BOOK_BUTTON = byElementName('mob-room-tile-book-now');
 
@@ -12,8 +12,9 @@ export class PropertyPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    // The review score is also an h1, so the title is scoped to the header block.
-    this.heading = page.locator(byTestId('header-cerebrum-with-favorite')).getByRole('heading', { level: 1 });
+    // The review score is also an h1 and the header wrapper differs between
+    // layout variants, so the title is taken from its own hook.
+    this.heading = page.locator(bySelenium('hotel-header-name'));
     this.roomGrid = page.locator(byElementName('roomgrid'));
     this.roomNames = page.locator(byTestId('room-name'));
   }

@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { ChildAges, Occupancy } from '../data/types';
-import { byElementName } from '../utils/locators';
+import { byElementName, bySelenium } from '../utils/locators';
 
 interface CounterSpec {
   /** Agoda's own hook for the number shown between the two buttons. */
@@ -15,17 +15,17 @@ interface CounterSpec {
  */
 const COUNTERS = {
   rooms: {
-    value: '[data-selenium="desktop-occ-room-value"]',
+    value: bySelenium('desktop-occ-room-value'),
     add: /^Add Rooms?$/,
     subtract: /^Subtract Rooms?$/,
   },
   adults: {
-    value: '[data-selenium="desktop-occ-adult-value"]',
+    value: bySelenium('desktop-occ-adult-value'),
     add: /^Add Adults?$/,
     subtract: /^Subtract Adults?$/,
   },
   children: {
-    value: '[data-selenium="desktop-occ-children-value"]',
+    value: bySelenium('desktop-occ-children-value'),
     add: /^Add Child(ren)?$/,
     subtract: /^Subtract Child(ren)?$/,
   },
