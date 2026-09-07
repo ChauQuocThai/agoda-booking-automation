@@ -18,5 +18,8 @@ export const MUONG_THANH_NHA_TRANG: BookingSearch = {
 /** Room index used in step 5 of the test case; the list is 0-based. */
 export const SECOND_ROOM_INDEX = 1;
 
-/** A price must look like a real amount, not an empty node or a placeholder. */
-export const PRICE_PATTERN = /[\d][\d.,]*/;
+/**
+ * Two digits at minimum, so the pattern rejects the stray single digits that
+ * appear all over a property card — "Sleeps 2", "5 still available", "0".
+ */
+export const PRICE_PATTERN = /\d[\d.,]*\d/;

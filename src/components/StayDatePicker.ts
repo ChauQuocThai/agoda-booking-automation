@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { byElementName } from '../utils/locators';
-import { monthsBetween, toIsoDate } from '../utils/date';
+import { monthsBetween, toIsoDate, toSearchBoxDate } from '../utils/date';
 
 /**
  * Agoda tags every day in the calendar with its own ISO date attribute. That
@@ -26,8 +26,8 @@ export class StayDatePicker {
     await this.pickDay(checkInIso);
     await this.pickDay(checkOutIso);
 
-    await expect(this.checkInBox).toContainText(dayOfMonth(checkInIso));
-    await expect(this.checkOutBox).toContainText(dayOfMonth(checkOutIso));
+    await expect(this.checkInBox).toContainText(toSearchBoxDate(checkInIso));
+    await expect(this.checkOutBox).toContainText(toSearchBoxDate(checkOutIso));
   }
 
   /**
@@ -59,8 +59,4 @@ export class StayDatePicker {
     await expect(cell).toBeVisible();
     await cell.click();
   }
-}
-
-function dayOfMonth(isoDate: string): string {
-  return String(Number(isoDate.split('-')[2]));
 }

@@ -3,10 +3,6 @@ import { BasePage } from './BasePage';
 import { byElementName, byTestId } from '../utils/locators';
 
 export class PaymentPage extends BasePage {
-  get url(): string {
-    return this.page.url();
-  }
-
   get hotelName(): Locator {
     return this.page.locator(byTestId('property-name-id'));
   }

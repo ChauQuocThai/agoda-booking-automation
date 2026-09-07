@@ -16,7 +16,7 @@ export function toIsoDate(date: Date): string {
 }
 
 /** "2026-10-07" -> "Oct 7", the form the payment page prints. */
-export function toShortDate(isoDate: string): string {
+export function toPaymentDate(isoDate: string): string {
   const [year, month, day] = isoDate.split('-').map(Number);
   return new Date(year, month - 1, day).toLocaleDateString('en-US', {
     month: 'short',
@@ -28,4 +28,14 @@ export function monthsBetween(fromIso: string, toIso: string): number {
   const [fy, fm] = fromIso.split('-').map(Number);
   const [ty, tm] = toIso.split('-').map(Number);
   return (ty - fy) * 12 + (tm - fm);
+}
+
+/** "2026-10-07" -> "7 Oct 2026", the form the search box prints. */
+export function toSearchBoxDate(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-').map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
 }

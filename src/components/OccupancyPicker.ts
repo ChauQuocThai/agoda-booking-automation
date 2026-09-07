@@ -39,12 +39,13 @@ function ageOptionLabel(age: number): string {
 }
 
 export class OccupancyPicker {
-  private readonly trigger: Locator;
+  /** The closed control, which summarises the current selection. */
+  readonly box: Locator;
   private readonly panel: Locator;
   private readonly childAgeFields: Locator;
 
   constructor(private readonly page: Page) {
-    this.trigger = page.locator(byElementName('occupancy-box'));
+    this.box = page.locator(byElementName('occupancy-box'));
     this.panel = page.locator(byElementName('occupancy-selector-panel'));
     this.childAgeFields = page.locator(byElementName('occ-child-age-dropdown'));
   }
@@ -59,7 +60,7 @@ export class OccupancyPicker {
 
   private async open(): Promise<void> {
     if (!(await this.panel.isVisible().catch(() => false))) {
-      await this.trigger.click();
+      await this.box.click();
     }
     await expect(this.panel).toBeVisible();
   }
@@ -101,9 +102,5 @@ export class OccupancyPicker {
       await this.page.getByText(label, { exact: true }).last().click();
       await expect(field).toContainText(label);
     }
-  }
-
-  async summary(): Promise<string> {
-    return (await this.trigger.innerText()).replace(/\s+/g, ' ').trim();
   }
 }
