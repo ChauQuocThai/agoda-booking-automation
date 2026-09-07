@@ -21,6 +21,8 @@ export default defineConfig({
   ],
 
   use: {
+    // Headless by default; `--headed` on the command line overrides it.
+    headless: true,
     baseURL: 'https://www.agoda.com',
     viewport: { width: 1440, height: 900 },
     locale: 'en-US',

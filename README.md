@@ -75,15 +75,41 @@ serve a positive and a negative check.
 
 ## Running the tests
 
+The suite runs in two modes.
+
+### Headless — no browser window
+
 ```bash
-npm test                  # headless, Chromium
-npm run test:headed       # watch it drive the browser
+npm test
+```
+
+The browser runs without a visible window. This is the default in
+`playwright.config.ts`, and the mode to use for CI and for a quick check: it is
+the faster of the two and does not need a desktop session. A run takes roughly
+45 seconds.
+
+### Headed — a real browser window on screen
+
+```bash
+npm run test:headed
+```
+
+Chromium opens on screen and the test drives it while you watch, which is the
+mode to use when demonstrating the flow or working out why a step behaves
+oddly. It is pinned to a single worker so there is only ever one window to
+follow, and it is a little slower than headless because the browser is actually
+painting frames.
+
+`--headed` on the command line overrides the config, so
+`npx playwright test --headed` does the same thing.
+
+### Other commands
+
+```bash
 npm run test:debug        # step through with the Playwright inspector
 npm run typecheck         # tsc --noEmit
 npm run report            # open the last HTML report
 ```
-
-A single run takes roughly 45 seconds.
 
 ## Supported browsers and platforms
 
