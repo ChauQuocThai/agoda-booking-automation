@@ -15,17 +15,6 @@ export function toIsoDate(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-/** "2026-10-07" -> "7 October 2026", the format Agoda prints on the search box. */
-export function toReadableDate(isoDate: string): string {
-  const [year, month, day] = isoDate.split('-').map(Number);
-  const date = new Date(year, month - 1, day);
-  return date.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-}
-
 /** "2026-10-07" -> "Oct 7", the form the payment page prints. */
 export function toShortDate(isoDate: string): string {
   const [year, month, day] = isoDate.split('-').map(Number);

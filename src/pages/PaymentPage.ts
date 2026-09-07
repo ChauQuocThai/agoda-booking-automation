@@ -31,8 +31,4 @@ export class PaymentPage extends BasePage {
   get roomPrice(): Locator {
     return this.page.locator(byElementName('fpc-room-price')).first();
   }
-
-  get priceBreakdown(): Locator {
-    return this.page.locator(byElementName('bf-price-break-down-section'));
-  }
 }

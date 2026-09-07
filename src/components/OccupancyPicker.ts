@@ -33,7 +33,7 @@ const COUNTERS = {
 
 type CounterName = keyof typeof COUNTERS;
 
-export function ageOptionLabel(age: number): string {
+function ageOptionLabel(age: number): string {
   if (age < 1) return '<1 year old';
   return age === 1 ? '1 year old' : `${age} years old`;
 }
