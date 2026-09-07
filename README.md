@@ -52,6 +52,7 @@ are derived from the current date at run time, so the test data never expires.
 │   │   └── booking.data.ts       The one booking scenario, as typed data
 │   ├── utils/
 │   │   ├── date.ts               Offsets from today, and the date formats the site prints
+│   │   ├── occupancy.ts          The child-age labels Agoda lists
 │   │   └── locators.ts           Named wrappers for Agoda's three hook attributes
 │   ├── components/
 │   │   ├── DestinationAutosuggest.ts   The search field and its suggestion panel
@@ -66,7 +67,8 @@ are derived from the current date at run time, so the test data never expires.
 │   └── fixtures/
 │       └── booking.ts            Supplies a home page that is loaded and clear of overlays
 └── tests/
-    └── booking-flow.spec.ts      TC-001, written as named steps
+    ├── booking-flow.spec.ts      TC-001, written as named steps
+    └── unit/                     The pure helpers, no browser
 ```
 
 Locators and actions live in the page and component objects; assertions live in
@@ -85,8 +87,8 @@ npm test
 
 The browser runs without a visible window. This is the default in
 `playwright.config.ts`, and the mode to use for CI and for a quick check: it is
-the faster of the two and does not need a desktop session. A run takes roughly
-45 seconds.
+the faster of the two and does not need a desktop session. The browser test
+takes about 50 seconds when the site is responsive, and longer when it is not.
 
 ### Headed — a real browser window on screen
 
@@ -103,9 +105,21 @@ painting frames.
 `--headed` on the command line overrides the config, so
 `npx playwright test --headed` does the same thing.
 
+### Unit tests
+
+```bash
+npm run test:unit
+```
+
+The date and child-age helpers are the only logic this suite computes rather
+than reads off the page, and they are covered in a project of their own. No
+browser starts and the set finishes in about a second, so `npm test` runs both
+and the reported duration is still the browser test's.
+
 ### Other commands
 
 ```bash
+npm run test:e2e          # the browser test alone
 npm run test:debug        # step through with the Playwright inspector
 npm run typecheck         # tsc --noEmit
 npm run report            # open the last HTML report
@@ -113,7 +127,8 @@ npm run report            # open the last HTML report
 
 ## Supported browsers and platforms
 
-Verified on **Chromium** on Windows 10, five consecutive passing runs.
+Verified on **Chromium** on Windows 10: five consecutive runs with retries
+turned off, each passing on the first attempt, between 47 and 51 seconds.
 
 Firefox and WebKit are configured but excluded from a default run, because
 Agoda serves them a different auto-suggest response and the property selection
@@ -130,8 +145,9 @@ the site* below for why the site itself is the variable here.
 ## Test report
 
 `npm test` writes an HTML report to `playwright-report/`; open it with
-`npm run report`. Each test appears as the ten named steps of TC-001, so a
-failure points at the step that broke rather than at a line number.
+`npm run report`. The browser test appears as the named steps of TC-001, so a
+failure points at the step that broke rather than at a line number, and a run
+that had to substitute a property records which one under annotations.
 
 On failure Playwright also keeps, under `test-results/`:
 
@@ -170,8 +186,9 @@ suite. These were measured, not assumed.
 
 ## Waiting strategy
 
-There is no fixed sleep anywhere in this repository, and no polling loop written
-by hand.
+There is no fixed sleep anywhere in this repository. Two loops do exist — one
+pages the calendar, one drives an occupancy counter — and each is bounded by a
+web-first assertion rather than by a timer.
 
 Playwright waits for an element to be attached, visible, stable, enabled and
 able to receive events before it acts on it, so a separate wait before each
@@ -179,5 +196,5 @@ action would be redundant. Where a condition is not a single element — a room
 grid that has to fetch its rows, or a destination that may open in either the
 current tab or a new one — the wait is expressed with a web-first assertion or
 with `expect.poll`, both of which retry until the condition holds or the
-timeout in `playwright.config.ts` expires. Timeouts live in that one file rather
-than being spread through the page objects.
+timeout in `playwright.config.ts` expires. The defaults live in that one file;
+the few places that need longer or shorter say so at the call site and say why.

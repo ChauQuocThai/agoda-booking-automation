@@ -66,3 +66,36 @@ walks up to two results, which is what its three-minute timeout affords.
   actually selected earlier in the same run — never a hard-coded amount.
 - The test stops at the payment page. No booking is submitted and no personal
   or payment details are entered.
+
+## Scope and next cases
+
+This case covers the booking funnel once, for one family shape, on the property
+the brief names. The cases below are the ones worth adding next, in order.
+
+1. **A second property.** One more `BookingSearch` literal in
+   `src/data/booking.data.ts` and a loop over the two — the scenario is data, so
+   this is not a second test body.
+2. **A different family shape.** One `childAges` array: three children, or none,
+   which is also the check that the age fields disappear when they should.
+3. **A multi-night stay.** Two numbers in `dates`; it additionally proves the
+   payment page's night count follows the range rather than defaulting to one.
+4. **An invalid range** — check-out before check-in. The highest-value negative
+   case, and the one this suite cannot express today, because the calendar will
+   not let the second date be clicked before the first.
+5. **A currency or locale sweep.** Left last on purpose: it asserts Agoda's
+   pricing and translation rather than the booking flow, and the price assertion
+   here already checks shape rather than amount so it survives either.
+
+### Known limitations
+
+- The stay dates come from the Node clock while the browser is pinned to
+  `Asia/Ho_Chi_Minh`, so on a machine far enough west of that zone "today + 30"
+  can be the site's day 29. Documented rather than fixed, because pinning both
+  to one clock would hide a real class of booking bug.
+- The occupancy values are read from Agoda's desktop hooks, which is part of why
+  Firefox and WebKit are opt-in rather than verified.
+- The price assertions check that an amount is present and well formed, never
+  the amount itself. Agoda's prices change daily.
+- Agoda caps a search at 30 rooms and silently ignores further clicks rather
+  than disabling the control, so the occupancy component detects lack of
+  progress instead of trusting the button's state.
