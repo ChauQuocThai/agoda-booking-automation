@@ -32,9 +32,16 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
 
+  // Chromium is the verified target. Agoda serves Firefox and WebKit a
+  // different auto-suggest, so those are opt-in rather than part of a default
+  // run — see "Supported browsers" in the README.
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+    ...(process.env.ALL_BROWSERS === '1'
+      ? [
+          { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+          { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+        ]
+      : []),
   ],
 });

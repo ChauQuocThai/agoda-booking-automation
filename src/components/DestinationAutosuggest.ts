@@ -22,7 +22,7 @@ export class DestinationAutosuggest {
     await this.type(keyword);
 
     if (!(await this.isOffered(propertyName))) {
-      await this.input.pressSequentially(propertyName.slice(keyword.length), { delay: 80 });
+      await this.type(propertyName);
     }
 
     const option = this.optionNamed(propertyName);
