@@ -21,9 +21,6 @@ export default defineConfig({
   ],
 
   use: {
-    // Agoda ships its own hooks as data-element-name, so getByTestId() maps
-    // straight onto them wherever a role or a label is not expressive enough.
-    testIdAttribute: 'data-element-name',
     baseURL: 'https://www.agoda.com',
     viewport: { width: 1440, height: 900 },
     locale: 'en-US',

@@ -8,22 +8,23 @@ export interface Occupancy {
 }
 
 export interface StayDates {
-  /** Nights offset from today, so the data never goes stale. */
+  /** Offsets from today, so the data never goes stale. */
   checkInOffsetDays: number;
   checkOutOffsetDays: number;
 }
 
 export interface BookingSearch {
   searchKeyword: string;
-  /** Full label as rendered in the auto-suggest dropdown. */
+  /** Property name as rendered in the auto-suggest dropdown. */
   expectedSuggestion: string;
-  /** Hotel name on its own, used to match headings on later pages. */
+  /** Name used to match headings on the results, property and payment pages. */
   hotelName: string;
   dates: StayDates;
   occupancy: Occupancy;
 }
 
-export interface SelectedRoom {
+/** What a search result card advertises before the property page is opened. */
+export interface HotelOffer {
   name: string;
   price: string;
 }

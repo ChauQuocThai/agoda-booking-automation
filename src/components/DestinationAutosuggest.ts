@@ -1,4 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
+import { byElementName } from '../utils/locators';
 
 export class DestinationAutosuggest {
   private readonly input: Locator;
@@ -8,13 +9,13 @@ export class DestinationAutosuggest {
     // The field's accessible name is A/B tested between "Enter a destination or
     // property" and "Where would you like to go?", so it is reached through the
     // surrounding box, which stays put across variants.
-    this.input = page.getByTestId('autocomplete-box').getByRole('combobox');
-    this.panel = page.getByTestId('search-box-autocomplete');
+    this.input = page.locator(byElementName('autocomplete-box')).getByRole('combobox');
+    this.panel = page.locator(byElementName('search-box-autocomplete'));
   }
 
   /**
    * Suggestions are ranked per session, so a short keyword does not always
-   * surface the wanted property. Type the keyword first, and only extend the
+   * surface the wanted property. Type the keyword first and only extend the
    * query when the property is missing from the list it returns.
    */
   async chooseProperty(keyword: string, propertyName: string): Promise<void> {
@@ -48,9 +49,5 @@ export class DestinationAutosuggest {
   /** Options carry React-generated ids that change on every render, so match on the name. */
   private optionNamed(propertyName: string): Locator {
     return this.panel.getByRole('option').filter({ hasText: propertyName }).first();
-  }
-
-  async offeredNames(): Promise<string[]> {
-    return this.panel.getByRole('option').allInnerTexts();
   }
 }

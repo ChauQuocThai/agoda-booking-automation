@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { ChildAges, Occupancy } from '../data/types';
+import { byElementName } from '../utils/locators';
 
 interface CounterSpec {
   /** Agoda's own hook for the number shown between the two buttons. */
@@ -43,9 +44,9 @@ export class OccupancyPicker {
   private readonly childAgeFields: Locator;
 
   constructor(private readonly page: Page) {
-    this.trigger = page.getByTestId('occupancy-box');
-    this.panel = page.getByTestId('occupancy-selector-panel');
-    this.childAgeFields = page.getByTestId('occ-child-age-dropdown');
+    this.trigger = page.locator(byElementName('occupancy-box'));
+    this.panel = page.locator(byElementName('occupancy-selector-panel'));
+    this.childAgeFields = page.locator(byElementName('occ-child-age-dropdown'));
   }
 
   async apply(occupancy: Occupancy): Promise<void> {
@@ -81,7 +82,7 @@ export class OccupancyPicker {
   }
 
   /**
-   * Each age field is a button that opens its own listbox, not a <select>, so
+   * Each age field is a button that opens its own list, not a <select>, so
    * selectOption() does not apply. The click is forced because Agoda paints a
    * decorative "(Required)" hint over the control until an age is chosen.
    */

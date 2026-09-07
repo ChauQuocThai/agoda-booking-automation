@@ -1,10 +1,12 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
+import { SearchResultsPage } from './SearchResultsPage';
 import { DestinationAutosuggest } from '../components/DestinationAutosuggest';
 import { OccupancyPicker } from '../components/OccupancyPicker';
 import { StayDatePicker } from '../components/StayDatePicker';
 import { BookingSearch } from '../data/types';
 import { isoDateFromToday } from '../utils/date';
+import { byElementName } from '../utils/locators';
 
 export class HomePage extends BasePage {
   readonly destination: DestinationAutosuggest;
@@ -17,7 +19,7 @@ export class HomePage extends BasePage {
     this.destination = new DestinationAutosuggest(page);
     this.dates = new StayDatePicker(page);
     this.occupancy = new OccupancyPicker(page);
-    this.searchButton = page.getByTestId('search-button');
+    this.searchButton = page.locator(byElementName('search-button'));
   }
 
   async open(): Promise<void> {
@@ -37,16 +39,9 @@ export class HomePage extends BasePage {
     await this.occupancy.apply(booking.occupancy);
   }
 
-  /**
-   * Search normally navigates in place, but some variants open a tab instead,
-   * so both are accepted and whichever appears becomes the results page.
-   */
-  async submitSearch(): Promise<Page> {
-    const newTab = this.page.context().waitForEvent('page', { timeout: 5_000 }).catch(() => null);
-    await this.searchButton.click();
-
-    const results = (await newTab) ?? this.page;
-    await results.waitForLoadState('domcontentloaded');
-    return results;
+  /** Results replace the current page on some variants and open a tab on others. */
+  async submitSearch(): Promise<SearchResultsPage> {
+    const target = await this.navigateTo('/search', () => this.searchButton.click());
+    return new SearchResultsPage(target);
   }
 }

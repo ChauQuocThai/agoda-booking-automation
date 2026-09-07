@@ -1,4 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
+import { byElementName } from '../utils/locators';
 import { monthsBetween, toIsoDate } from '../utils/date';
 
 /**
@@ -7,6 +8,7 @@ import { monthsBetween, toIsoDate } from '../utils/date';
  * by its value avoids counting cells or parsing the visible month heading.
  */
 const DAY_CELL = (isoDate: string) => `[data-selenium-date="${isoDate}"]`;
+const ANY_DAY_CELL = '[data-selenium-date]';
 
 export class StayDatePicker {
   private readonly checkInBox: Locator;
@@ -14,8 +16,8 @@ export class StayDatePicker {
   private readonly nextMonth: Locator;
 
   constructor(private readonly page: Page) {
-    this.checkInBox = page.getByTestId('check-in-box');
-    this.checkOutBox = page.getByTestId('check-out-box');
+    this.checkInBox = page.locator(byElementName('check-in-box'));
+    this.checkOutBox = page.locator(byElementName('check-out-box'));
     this.nextMonth = page.getByRole('button', { name: 'Next Month' });
   }
 
@@ -28,10 +30,18 @@ export class StayDatePicker {
     await expect(this.checkOutBox).toContainText(dayOfMonth(checkOutIso));
   }
 
-  /** Choosing a property opens the calendar on its own, so only click when it is closed. */
+  /**
+   * Choosing a property opens the calendar on its own, but not instantly.
+   * Give that a moment before clicking, or the click closes what just opened.
+   */
   private async open(): Promise<void> {
-    const anyDay = this.page.locator('[data-selenium-date]').first();
-    if (!(await anyDay.isVisible().catch(() => false))) {
+    const anyDay = this.page.locator(ANY_DAY_CELL).first();
+    const openedByItself = await anyDay
+      .waitFor({ state: 'visible', timeout: 5_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!openedByItself) {
       await this.checkInBox.click();
     }
     await expect(anyDay).toBeVisible();
@@ -40,9 +50,9 @@ export class StayDatePicker {
   private async pickDay(isoDate: string): Promise<void> {
     const cell = this.page.locator(DAY_CELL(isoDate)).first();
 
-    // The calendar renders two months; anything further ahead needs paging.
+    // Two months are rendered at a time; anything further ahead needs paging.
     const monthsAhead = monthsBetween(toIsoDate(new Date()), isoDate);
-    for (let page = 0; page < monthsAhead && !(await cell.isVisible()); page++) {
+    for (let paged = 0; paged < monthsAhead && !(await cell.isVisible()); paged++) {
       await this.nextMonth.click();
     }
 
