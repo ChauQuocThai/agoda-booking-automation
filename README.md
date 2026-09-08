@@ -1,5 +1,7 @@
 # Agoda booking flow automation
 
+## Project overview and technology stack
+
 End-to-end automation of the booking funnel on [agoda.com](https://www.agoda.com):
 search for a specific property, describe a family stay, open the property from
 the results, book the first rate of the second room type, and verify that the
@@ -7,8 +9,6 @@ payment page still reflects every earlier choice.
 
 The test stops at the payment page. Nothing is booked and no personal or
 payment details are entered.
-
-## Technology stack
 
 | | |
 |---|---|
@@ -27,7 +27,7 @@ payment details are entered.
 | TypeScript | 5.6.3 | type checking only; Playwright transpiles the tests |
 | Git | 2.51 | |
 
-## Setup
+## Setup and configuration steps
 
 ```bash
 git clone <repository-url>
@@ -75,7 +75,7 @@ Locators and actions live in the page and component objects; assertions live in
 the test. The page objects return state and never judge it, so the same methods
 serve a positive and a negative check.
 
-## Running the tests
+## Commands to run tests
 
 The suite runs in two modes.
 
@@ -183,18 +183,3 @@ suite. These were measured, not assumed.
 - **Prices and room names change daily.** Assertions check that a price is
   present and well formed, and that names carried between pages match what was
   selected earlier in the same run. No amount is hard-coded.
-
-## Waiting strategy
-
-There is no fixed sleep anywhere in this repository. Two loops do exist — one
-pages the calendar, one drives an occupancy counter — and each is bounded by a
-web-first assertion rather than by a timer.
-
-Playwright waits for an element to be attached, visible, stable, enabled and
-able to receive events before it acts on it, so a separate wait before each
-action would be redundant. Where a condition is not a single element — a room
-grid that has to fetch its rows, or a destination that may open in either the
-current tab or a new one — the wait is expressed with a web-first assertion or
-with `expect.poll`, both of which retry until the condition holds or the
-timeout in `playwright.config.ts` expires. The defaults live in that one file;
-the few places that need longer or shorter say so at the call site and say why.
