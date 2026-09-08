@@ -100,33 +100,42 @@ export class OccupancyPicker {
    * selectOption() does not apply. The click is forced because Agoda paints a
    * decorative "(Required)" hint over the control until an age is chosen.
    *
-   * Agoda ships two versions of this widget. One tears the option list down
-   * after a pick and reports aria-expanded honestly; the other leaves the list
-   * mounted and never updates aria-expanded, so a click meant for the next
-   * field can land in the list left over from the previous one and overwrite an
-   * age already chosen. Nothing in the DOM distinguishes them at the point of
-   * clicking, so the ages are set as a set: fields already holding the right
-   * label are skipped, and the whole pass repeats until every one of them does.
+   * Agoda also leaves the list mounted after a pick on some renders, and that
+   * leftover swallows the click meant for the next field - which either strands
+   * it unset or applies the age to the field before it. Reopening the panel
+   * between children is what clears it; targeting the list directly cannot,
+   * because nothing in the DOM says which field it currently belongs to.
    */
   private async setChildAges(ages: ChildAges): Promise<void> {
-    await expect(this.childAgeFields).toHaveCount(ages.length);
-
-    await expect(async () => {
-      for (const [index, age] of ages.entries()) {
-        const field = this.childAgeFields.nth(index);
-        const label = ageOptionLabel(age);
-
-        if ((await field.innerText()).includes(label)) continue;
-
-        await field.scrollIntoViewIfNeeded();
-        await field.click({ force: true });
-        await this.page.getByText(label, { exact: true }).last().click();
+    for (const [index, age] of ages.entries()) {
+      if (index > 0) {
+        await this.reopen();
       }
 
-      for (const [index, age] of ages.entries()) {
-        await expect(this.childAgeFields.nth(index), `child ${index + 1}`)
-          .toContainText(ageOptionLabel(age), { timeout: 3_000 });
-      }
-    }).toPass({ timeout: 60_000 });
+      await expect(this.childAgeFields).toHaveCount(ages.length);
+      const field = this.childAgeFields.nth(index);
+      const label = ageOptionLabel(age);
+
+      await field.scrollIntoViewIfNeeded();
+      await field.click({ force: true });
+
+      // The list is portalled to the end of the body and does not always expose
+      // an option role, so the entry is matched on its label instead.
+      await this.page.getByText(label, { exact: true }).last().click();
+      await expect(field).toContainText(label);
+    }
+
+    // Checked again as a set: each field was green when it was set, so an age
+    // overwritten afterwards would otherwise go unnoticed.
+    for (const [index, age] of ages.entries()) {
+      await expect(this.childAgeFields.nth(index), `child ${index + 1}`).toContainText(ageOptionLabel(age));
+    }
+  }
+
+  private async reopen(): Promise<void> {
+    await this.box.click();
+    await expect(this.panel).toBeHidden();
+    await this.box.click();
+    await expect(this.panel).toBeVisible();
   }
 }

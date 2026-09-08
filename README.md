@@ -88,9 +88,7 @@ npm test
 The browser runs without a visible window. This is the default in
 `playwright.config.ts`, and the mode to use for CI and for a quick check: it is
 the faster of the two and does not need a desktop session. The browser test
-takes about a minute, a little less when the site is responsive and a little
-more when the occupancy widget needs a second pass - see the last entry under
-known behaviour.
+takes about 50 seconds.
 
 ### Headed — a real browser window on screen
 
@@ -130,7 +128,7 @@ npm run report            # open the last HTML report
 ## Supported browsers and platforms
 
 Verified on **Chromium** on Windows 10: six consecutive runs with retries
-turned off, each passing on the first attempt, between 46 seconds and 1m20.
+turned off, each passing on the first attempt, between 47 and 55 seconds.
 
 Firefox and WebKit are configured but excluded from a default run, because
 Agoda serves them a different auto-suggest response and the property selection
@@ -182,13 +180,12 @@ suite. These were measured, not assumed.
 - **"The second room type" is not "the second Book button".** One room type
   offers several rates, so the first room type alone can hold four Book buttons.
   The room's block is resolved from its name to be sure the right rate is used.
-- **The child-age widget ships in two versions.** One tears its option list
-  down after a pick and reports `aria-expanded` honestly; the other leaves the
-  list mounted and never updates it, so a click meant for the next field can
-  land in the leftover list and overwrite an age already chosen. Nothing in the
-  DOM tells the two apart at the moment of clicking, so the ages are set as a
-  set: fields already holding the right label are skipped and the pass repeats
-  until every one of them does.
+- **The child-age list is not always torn down after a pick.** On some renders
+  it stays mounted, and that leftover swallows the click meant for the next
+  child - stranding it unset, or applying the age to the field before it.
+  Nothing in the DOM says which field the list currently belongs to, so the
+  panel is closed and reopened between children, which clears it. The ages are
+  then checked again as a set, because each field was green when it was set.
 - **Prices and room names change daily.** Assertions check that a price is
   present and well formed, and that names carried between pages match what was
   selected earlier in the same run. No amount is hard-coded.
