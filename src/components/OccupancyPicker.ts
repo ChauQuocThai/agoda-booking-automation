@@ -99,21 +99,34 @@ export class OccupancyPicker {
    * Each age field is a button that opens its own list, not a <select>, so
    * selectOption() does not apply. The click is forced because Agoda paints a
    * decorative "(Required)" hint over the control until an age is chosen.
+   *
+   * Agoda ships two versions of this widget. One tears the option list down
+   * after a pick and reports aria-expanded honestly; the other leaves the list
+   * mounted and never updates aria-expanded, so a click meant for the next
+   * field can land in the list left over from the previous one and overwrite an
+   * age already chosen. Nothing in the DOM distinguishes them at the point of
+   * clicking, so the ages are set as a set: fields already holding the right
+   * label are skipped, and the whole pass repeats until every one of them does.
    */
   private async setChildAges(ages: ChildAges): Promise<void> {
     await expect(this.childAgeFields).toHaveCount(ages.length);
 
-    for (const [index, age] of ages.entries()) {
-      const field = this.childAgeFields.nth(index);
-      const label = ageOptionLabel(age);
+    await expect(async () => {
+      for (const [index, age] of ages.entries()) {
+        const field = this.childAgeFields.nth(index);
+        const label = ageOptionLabel(age);
 
-      await field.scrollIntoViewIfNeeded();
-      await field.click({ force: true });
+        if ((await field.innerText()).includes(label)) continue;
 
-      // The list is portalled to the end of the body and does not always expose
-      // an option role, so the entry is matched on its label instead.
-      await this.page.getByText(label, { exact: true }).last().click();
-      await expect(field).toContainText(label);
-    }
+        await field.scrollIntoViewIfNeeded();
+        await field.click({ force: true });
+        await this.page.getByText(label, { exact: true }).last().click();
+      }
+
+      for (const [index, age] of ages.entries()) {
+        await expect(this.childAgeFields.nth(index), `child ${index + 1}`)
+          .toContainText(ageOptionLabel(age), { timeout: 3_000 });
+      }
+    }).toPass({ timeout: 60_000 });
   }
 }
